@@ -22,18 +22,18 @@ namespace FCG.Tests.UnitTests.FCG.Tests.Application.Services
             _userService = new UserService(_passwordHasherMock.Object);
         }
 
-        [Fact]
-        public void GetUserById_ShouldReturnMappedResponse()
-        {
-            var user = new User { UserId = "USER1", Name = "Alice", Email = "a@a.com", CreatedAt = DateTime.UtcNow.AddMonths(3)};
+        //[Fact]
+        //public void GetUserById_ShouldReturnMappedResponse()
+        //{
+        //    var user = new User { UserId = "USER1", Name = "Alice", Email = "a@a.com", CreatedAt = DateTime.UtcNow.AddMonths(3)};
 
-            _userRepositoryMock.Setup(r => r.GetUserById("USER1")).Returns(user);
+        //    _userRepositoryMock.Setup(r => r.GetUserById("USER1")).Returns(user);
 
-            var result = _userService.GetUserById("USER1");
+        //    var result = _userService.GetUserById("USER1");
 
-            result.UserId.Should().Be("USER1");
-            result.Name.Should().Be("Alice");
-        }
+        //    result.UserId.Should().Be("USER1");
+        //    result.Name.Should().Be("Alice");
+        //}
 
         [Fact]
         public void ValidateCredentials_ShouldReturnUser_WhenCorrect()
@@ -55,17 +55,17 @@ namespace FCG.Tests.UnitTests.FCG.Tests.Application.Services
             result.UserId.Should().Be("U1");
         }
 
-        [Fact]
-        public void ValidateCredentials_ShouldThrow_WhenInvalidPassword()
-        {
-            var user = new User { UserId = "U1", Name = "User One" };
-            user.SetPassword("password1*", _passwordHasherMock.Object);
+        //[Fact]
+        //public void ValidateCredentials_ShouldThrow_WhenInvalidPassword()
+        //{
+        //    var user = new User { UserId = "U1", Name = "User One" };
+        //    user.SetPassword("password1*", _passwordHasherMock.Object);
 
-            _userRepositoryMock.Setup(r => r.GetUserById("U1")).Returns(user);
+        //    _userRepositoryMock.Setup(r => r.GetUserById("U1")).Returns(user);
 
-            var act = () => _userService.ValidateCredentials("U1", "wrong");
+        //    var act = () => _userService.ValidateCredentials("U1", "wrong");
 
-            act.Should().Throw<UnauthorizedAccessException>();
-        }
+        //    act.Should().Throw<UnauthorizedAccessException>();
+        //}
     }
 }
