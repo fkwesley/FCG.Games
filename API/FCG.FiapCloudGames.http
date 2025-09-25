@@ -1,0 +1,21 @@
+@FCG.FiapCloudGames_HostAddress = https://localhost:7243
+@access_token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJBRE1JTiIsInVzZXJfaWQiOiJBRE1JTiIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL25hbWUiOiJBUFBMSUNBVElPTiBBRE1JTiIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IkFkbWluIiwiZXhwIjoxNzUzNTczMzU3LCJpc3MiOiJGQ0cuRmlhcENsb3VkR2FtZXMifQ.2Lsl0xfZvrAl8caq9OytaZrHp2ghwbpqeyl4J6z25Zo
+
+### Login (POST) - para gerar o token
+POST {{FCG.FiapCloudGames_HostAddress}}/auth/login
+Content-Type: application/json
+{
+  "userId": "admin",
+  "password": "Password1*"
+}
+
+###
+### GET Users (com Bearer Token)
+GET {{FCG.FiapCloudGames_HostAddress}}/users
+Authorization: Bearer {{access_token}}
+Accept: text/plain
+
+###
+GET {{FCG.FiapCloudGames_HostAddress}}/games/1
+Authorization: Bearer {{access_token}}
+Accept: text/plain

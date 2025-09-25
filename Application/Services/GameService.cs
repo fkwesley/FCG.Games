@@ -1,0 +1,88 @@
+﻿using Application.DTO.Game;
+using Application.Exceptions;
+using Application.Interfaces;
+using Application.Mappings;
+using Domain.Entities;
+using Domain.Enums;
+using Domain.Repositories;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
+using System.Net.Http;
+
+namespace Application.Services
+{
+    public class GameService : IGameService
+    {
+        private readonly IGameRepository _gameRepository;
+        private readonly ILoggerService _loggerService;
+        private readonly IHttpContextAccessor _httpContext;
+        private readonly IServiceScopeFactory _scopeFactory;
+
+        public GameService(
+                IGameRepository gameRepository, 
+                ILoggerService loggerService,
+                IHttpContextAccessor httpContext,
+                IServiceScopeFactory scopeFactory)
+        {
+            _gameRepository = gameRepository 
+                ?? throw new ArgumentNullException(nameof(gameRepository));
+            _loggerService = loggerService;
+            _httpContext = httpContext;
+            _scopeFactory = scopeFactory;
+        }
+
+        public async Task<IEnumerable<GameResponse>> GetAllGamesAsync()
+        {
+            var games = _gameRepository.GetAllGames();
+
+            using var scope = _scopeFactory.CreateScope();
+            var loggerService = scope.ServiceProvider.GetRequiredService<ILoggerService>();
+
+            await loggerService.LogTraceAsync(new Trace
+            {
+                LogId = _httpContext.HttpContext?.Items["RequestId"] as Guid?,
+                Timestamp = DateTime.UtcNow,
+                Level = LogLevel.Info,
+                Message = "Retrieved all games",
+                StackTrace = null
+            });
+
+            return games.Select(game => game.ToResponse()).ToList();
+        }
+
+        public GameResponse GetGameById(int id)
+        {
+            var gameFound = _gameRepository.GetGameById(id);
+
+            return gameFound.ToResponse();
+        }
+
+        public GameResponse AddGame(GameRequest game)
+        {
+            if (_gameRepository.GetAllGames().Any(g => g.Name == game.Name))
+                throw new ValidationException(string.Format("Game {0} already exists.",game.Name));
+
+            var gameEntity = game.ToEntity();
+            var gameAdded = _gameRepository.AddGame(gameEntity);
+
+            return gameAdded.ToResponse();
+        }
+
+        public GameResponse UpdateGame(GameRequest game)
+        {
+            if (_gameRepository.GetAllGames().Any(g => g.Name == game.Name && g.GameId != game.GameId))
+                throw new ValidationException(string.Format("Game {0} already exists.", game.Name));
+
+            var gameEntity = game.ToEntity();
+            var gameUpdated = _gameRepository.UpdateGame(gameEntity);
+
+            return gameUpdated.ToResponse();
+        }
+
+        public bool DeleteGame(int id)
+        {
+            return _gameRepository.DeleteGame(id);
+        }
+
+    }
+}

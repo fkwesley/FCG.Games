@@ -1,0 +1,134 @@
+name: CI/CD - FCG.Games
+  
+on:
+  push:
+    branches:
+      - '**'
+  pull_request:
+    branches:
+      - '**'
+
+jobs:
+  build-test-pushDockerImage:
+    runs-on: ubuntu-latest
+    outputs:
+      image_tag: ${{ steps.set_tag.outputs.image_tag }}
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8.0
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Restore
+        run: dotnet restore FCG.Games.sln
+
+      - name: Build
+        run: dotnet build FCG.Games.sln --configuration Release --no-restore
+
+      - name: Unit Tests with Coverage
+        run: dotnet test FCG.Games.sln --configuration Release --no-build --verbosity normal --collect:"XPlat Code Coverage"
+        
+      - name: Login to Azure Container Registry
+        run: echo ${{ secrets.AZURE_ACR_PASSWORD }} | docker login acrfcg.azurecr.io -u ${{ secrets.AZURE_ACR_USERNAME }} --password-stdin
+      
+      - name: Set Docker Image Tag
+        id: set_tag
+        run: |
+            SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
+            echo "image_tag=${SHORT_SHA}" >> $GITHUB_OUTPUT
+      
+      - name: Build Docker image
+        run: |
+            docker build -t acrfcg.azurecr.io/fiapcloudgames/games/api:latest \
+                         -t acrfcg.azurecr.io/fiapcloudgames/games/api:${{ steps.set_tag.outputs.image_tag }} .
+
+      - name: Push Docker image to ACR
+        run: |
+            docker push acrfcg.azurecr.io/fiapcloudgames/games/api:latest
+            docker push acrfcg.azurecr.io/fiapcloudgames/games/api:${{ steps.set_tag.outputs.image_tag }}
+
+  deploy-dev:
+    needs: build-test-pushDockerImage
+    runs-on: ubuntu-latest
+    environment: DEV
+
+    steps:
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Deploy to Container App - DEV
+        run: |
+          az containerapp update \
+            --name aca-fcg-games-dev \
+            --resource-group RG_FCG \
+            --image acrfcg.azurecr.io/fiapcloudgames/games/api:${{ needs.build-test-pushDockerImage.outputs.image_tag }} \
+            --set-env-vars \
+                "ConnectionStrings__FCGgamesDbConnection=${{ secrets.FCG_DB_CONNECTION_STRING }}" \
+                "NEW_RELIC_LICENSE_KEY=${{ secrets.NEW_RELIC_LICENSE_KEY }}" \
+                "NEW_RELIC_APP_NAME=${{ vars.NEW_RELIC_APP_NAME }}" \
+                "NewRelic__Enabled=${{ vars.NEW_RELIC_ENABLED }}" \
+                "NewRelic__Endpoint=${{ vars.NEW_RELIC_ENDPOINT }}" \
+                "AspNetCore__Environment=${{ vars.ENV }}"
+
+  deploy-uat:
+    needs:
+      - build-test-pushDockerImage
+      - deploy-dev
+    runs-on: ubuntu-latest
+    environment: UAT
+
+    steps:
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Deploy to Container App - UAT
+        run: |
+          az containerapp update \
+            --name aca-fcg-games-uat \
+            --resource-group RG_FCG \
+            --image acrfcg.azurecr.io/fiapcloudgames/games/api:${{ needs.build-test-pushDockerImage.outputs.image_tag }} \
+            --set-env-vars \
+                "ConnectionStrings__FCGgamesDbConnection=${{ secrets.FCG_DB_CONNECTION_STRING }}" \
+                "NEW_RELIC_LICENSE_KEY=${{ secrets.NEW_RELIC_LICENSE_KEY }}" \
+                "NEW_RELIC_APP_NAME=${{ vars.NEW_RELIC_APP_NAME }}" \
+                "NewRelic__Enabled=${{ vars.NEW_RELIC_ENABLED }}" \
+                "NewRelic__Endpoint=${{ vars.NEW_RELIC_ENDPOINT }}" \
+                "AspNetCore__Environment=${{ vars.ENV }}"
+
+  deploy-prd:
+    needs: 
+      - build-test-pushDockerImage
+      - deploy-dev
+      - deploy-uat
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    environment: PRD
+
+    steps:
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          
+      - name: Deploy to Container App - PRD
+        run: |
+          az containerapp update \
+            --name aca-fcg-games \
+            --resource-group RG_FCG \
+            --image acrfcg.azurecr.io/fiapcloudgames/games/api:${{ needs.build-test-pushDockerImage.outputs.image_tag }} \
+            --set-env-vars \
+                "ConnectionStrings__FCGgamesDbConnection=${{ secrets.FCG_DB_CONNECTION_STRING }}" \
+                "NEW_RELIC_LICENSE_KEY=${{ secrets.NEW_RELIC_LICENSE_KEY }}" \
+                "NEW_RELIC_APP_NAME=${{ vars.NEW_RELIC_APP_NAME }}" \
+                "NewRelic__Enabled=${{ vars.NEW_RELIC_ENABLED }}" \
+                "NewRelic__Endpoint=${{ vars.NEW_RELIC_ENDPOINT }}" \
+                "AspNetCore__Environment=${{ vars.ENV }}"
+
