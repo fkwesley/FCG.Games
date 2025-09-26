@@ -3,10 +3,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace FCG.Infrastructure.Migrations
+namespace Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class migration1 : Migration
+    public partial class first_migration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -18,10 +18,10 @@ namespace FCG.Infrastructure.Migrations
                     GameId = table.Column<int>(type: "INT", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     Genre = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
                     ReleaseDate = table.Column<DateOnly>(type: "DATE", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETUTCDATE()"),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Rating = table.Column<int>(type: "INT", nullable: true)
                 },
@@ -72,11 +72,6 @@ namespace FCG.Infrastructure.Migrations
                         principalColumn: "LogId",
                         onDelete: ReferentialAction.Restrict);
                 });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Request_log_UserId",
-                table: "Request_log",
-                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Trace_log_LogId",

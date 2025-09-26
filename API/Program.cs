@@ -125,12 +125,10 @@ builder.Services.AddSwaggerGen(c =>
 
 #region dependencyInjection
 // Dependency Injection for Application Layer
-builder.Services.AddSingleton<IAuthService>(new AuthService(jwtKey, jwtIssuer));
 builder.Services.AddSingleton<IPasswordHasherRepository, PasswordHasherRepository>();
 
 //services
 builder.Services.AddScoped<IGameService, GameService>();
-builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ILoggerService, LoggerService>();
 
 //repositories

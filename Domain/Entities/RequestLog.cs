@@ -15,7 +15,6 @@ namespace Domain.Entities
         public DateTime EndDate { get; set; }
         public TimeSpan Duration { get; set; }
 
-        public User? User { get; set; } = null; // Propriedade de navegação
         public IEnumerable<Trace>? Traces { get; set; } = null; // Propriedade de navegação para traces associados
     }
 }

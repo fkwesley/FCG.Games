@@ -9,11 +9,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace FCG.Infrastructure.Migrations
+namespace Infrastructure.Migrations
 {
     [DbContext(typeof(GamesDbContext))]
-    [Migration("20250602035235_migration-2")]
-    partial class migration2
+    [Migration("20250926002854_first_migration")]
+    partial class first_migration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,48 @@ namespace FCG.Infrastructure.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("Domain.Entities.Game", b =>
+                {
+                    b.Property<int>("GameId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INT");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("GameId"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Genre")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int?>("Rating")
+                        .HasColumnType("INT");
+
+                    b.Property<DateOnly>("ReleaseDate")
+                        .HasColumnType("DATE");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("GameId");
+
+                    b.ToTable("Game", (string)null);
+                });
 
             modelBuilder.Entity("Domain.Entities.RequestLog", b =>
                 {
@@ -64,8 +106,6 @@ namespace FCG.Infrastructure.Migrations
                         .HasColumnType("nvarchar(20)");
 
                     b.HasKey("LogId");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Request_log", (string)null);
                 });
@@ -108,103 +148,6 @@ namespace FCG.Infrastructure.Migrations
                     b.ToTable("Trace_log", (string)null);
                 });
 
-            modelBuilder.Entity("FCG.FiapCloudGames.Core.Entities.Game", b =>
-                {
-                    b.Property<int>("GameId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INT");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("GameId"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETUTCDATE()");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("Genre")
-                        .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<int?>("Rating")
-                        .HasColumnType("INT");
-
-                    b.Property<DateOnly>("ReleaseDate")
-                        .HasColumnType("DATE");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("GameId");
-
-                    b.ToTable("Game", (string)null);
-                });
-
-            modelBuilder.Entity("FCG.FiapCloudGames.Core.Entities.User", b =>
-                {
-                    b.Property<string>("UserId")
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETDATE()");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<bool>("IsActive")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(true);
-
-                    b.Property<bool>("IsAdmin")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false);
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("PasswordHash")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("UserId");
-
-                    b.ToTable("User", (string)null);
-                });
-
-            modelBuilder.Entity("Domain.Entities.RequestLog", b =>
-                {
-                    b.HasOne("FCG.FiapCloudGames.Core.Entities.User", "User")
-                        .WithMany("RequestLogs")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .HasConstraintName("FK_RequestLog_User");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("Domain.Entities.Trace", b =>
                 {
                     b.HasOne("Domain.Entities.RequestLog", "RequestLog")
@@ -219,11 +162,6 @@ namespace FCG.Infrastructure.Migrations
             modelBuilder.Entity("Domain.Entities.RequestLog", b =>
                 {
                     b.Navigation("Traces");
-                });
-
-            modelBuilder.Entity("FCG.FiapCloudGames.Core.Entities.User", b =>
-                {
-                    b.Navigation("RequestLogs");
                 });
 #pragma warning restore 612, 618
         }
