@@ -43,13 +43,6 @@ namespace Infrastructure.Configurations
                     v => DateTime.SpecifyKind(v, DateTimeKind.Utc) // Força Kind como UTC ao ler
                 );
             builder.Property(log => log.Duration).IsRequired();
-
-            // 🔗 Relacionamento com User (FK)
-            builder.HasOne(log => log.User)          // Um log tem um usuário
-                   .WithMany(u => u.RequestLogs)     // Um usuário tem muitos logs
-                   .HasForeignKey(log => log.UserId) // Chave estrangeira
-                   .HasConstraintName("FK_RequestLog_User") // Nome da FK (opcional)
-                   .OnDelete(DeleteBehavior.Restrict); // Para evitar delete em cascata
         }
     }
 }
