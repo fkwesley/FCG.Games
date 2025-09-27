@@ -15,6 +15,7 @@ namespace FCG.Infrastructure.Configurations
             builder.Property(g => g.Name).IsRequired().HasMaxLength(50);
             builder.Property(g => g.Description).IsRequired().HasMaxLength(200);
             builder.Property(g => g.Genre).IsRequired().HasMaxLength(30);
+            builder.Property(g => g.Price).IsRequired().HasColumnType("DECIMAL(18,2)");
             builder.Property(g => g.ReleaseDate).IsRequired().HasColumnType("DATE");
             builder.Property(g => g.Rating).IsRequired(false).HasColumnType("INT");
             builder.Property(g => g.CreatedAt)

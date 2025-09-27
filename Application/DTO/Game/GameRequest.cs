@@ -22,6 +22,9 @@ namespace Application.DTO.Game
         public required string Genre { get; set; }
 
         [Required]
+        public decimal Price { get; set; }
+
+        [Required]
         public DateOnly ReleaseDate { get; set; }
 
         public int? Rating { get; set; }

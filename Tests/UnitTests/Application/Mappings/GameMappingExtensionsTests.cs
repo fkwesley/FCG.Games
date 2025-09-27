@@ -36,6 +36,7 @@ namespace FCG.Tests.UnitTests.FCG.Tests.Application.Mappings
                 Name = "Halo",
                 Description = "Sci-fi shooter",
                 Genre = "FPS",
+                Price = 59.99m,
                 Rating = 5,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = null,
