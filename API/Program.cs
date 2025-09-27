@@ -89,7 +89,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 #region swagger
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new() { Title = "FCG.Users.API", Version = "v1" });
+    c.SwaggerDoc("v1", new() { Title = "FCG.Games.API", Version = "v1" });
 
     // Define o esquema de segurança JWT
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
