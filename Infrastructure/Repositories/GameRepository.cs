@@ -39,6 +39,7 @@ namespace Infrastructure.Repositories
                 existingGame.Name = game.Name;
                 existingGame.Description = game.Description;
                 existingGame.Genre = game.Genre;
+                existingGame.Price = game.Price;
                 existingGame.ReleaseDate = game.ReleaseDate;
                 existingGame.UpdatedAt = DateTime.UtcNow; 
                 existingGame.Rating = game.Rating;
