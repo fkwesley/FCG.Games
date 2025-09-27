@@ -38,7 +38,7 @@ namespace FCG.Tests.UnitTests.FCG.Tests.Application.Services
         public async Task GetAllGames_ShouldReturnAllGames()
         {
             // Arrange
-            var games = new List<Game> { new Game { GameId = 1, Name = "GTA IV", Description = "O mais aguardado", Genre = "Action", CreatedAt = DateTime.UtcNow.AddMinutes(50) } };
+            var games = new List<Game> { new Game { GameId = 1, Name = "GTA IV", Description = "O mais aguardado", Genre = "Action", Price = 120, CreatedAt = DateTime.UtcNow.AddMinutes(50) } };
             _gameRepositoryMock.Setup(r => r.GetAllGames()).Returns(games);
 
             var serviceProviderMock = new Mock<IServiceProvider>();
@@ -69,7 +69,8 @@ namespace FCG.Tests.UnitTests.FCG.Tests.Application.Services
             {
                 Name = gameName,
                 Description = description,
-                Genre = genre
+                Genre = genre,
+                Price = 562.2m
             }
         };
             _gameRepositoryMock.Setup(r => r.GetAllGames()).Returns(existingGames);
@@ -119,7 +120,7 @@ namespace FCG.Tests.UnitTests.FCG.Tests.Application.Services
         {
             // Arrange
             var request = new GameRequest { GameId = 2, Name = "Max Payne 3", Description = "Very good game", Genre = "Action" };
-            var games = new List<Game> { new Game { GameId = 1, Name = "Max Payne 3", Description = "other description", Genre = "Action" } };
+            var games = new List<Game> { new Game { GameId = 1, Name = "Max Payne 3", Description = "other description", Genre = "Action", Price = 1000} };
             _gameRepositoryMock.Setup(r => r.GetAllGames()).Returns(games);
 
             // Act

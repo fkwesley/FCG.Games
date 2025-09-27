@@ -16,6 +16,7 @@ namespace Application.Mappings
                 Name = request.Name,
                 Description = request.Description,
                 Genre = request.Genre,
+                Price = request.Price,
                 ReleaseDate = request.ReleaseDate,
                 Rating = request.Rating
             };
@@ -31,6 +32,7 @@ namespace Application.Mappings
                 Name = entity.Name,
                 Description = entity.Description,
                 Genre = entity.Genre,
+                Price = entity.Price,
                 ReleaseDate = entity.ReleaseDate,
                 CreatedAt = DateTimeHelper.ConvertUtcToTimeZone(entity.CreatedAt, "E. South America Standard Time"),
                 UpdatedAt = entity.UpdatedAt.HasValue ? 

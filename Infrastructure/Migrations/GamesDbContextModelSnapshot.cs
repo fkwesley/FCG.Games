@@ -50,6 +50,9 @@ namespace Infrastructure.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<decimal>("Price")
+                        .HasColumnType("DECIMAL(18,2)");
+
                     b.Property<int?>("Rating")
                         .HasColumnType("INT");
 
