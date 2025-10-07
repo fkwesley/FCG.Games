@@ -160,9 +160,28 @@ namespace Infrastructure.Services
             return result;
         }
 
-        public async Task<List<GameResponse>> GetMostPopularGamesAsync(int top = 10)
+        public async Task<List<GameDocument>> GetTopRatedGamesAsync(int top = 10)
         {
-            throw new NotImplementedException();
+            var searchResponse = await _client.SearchAsync<GameDocument>(s => s
+                .Size(top)
+                .Sort(ss => ss
+                    .Field(f => f.Rating, SortOrder.Desc)
+                )
+            );
+
+            if (!searchResponse.IsValidResponse)
+                throw new Exception($"Search failed: {searchResponse.DebugInformation}");
+
+            return searchResponse.Documents.Select(doc => new GameDocument
+            {
+                Id = doc.Id,
+                Name = doc.Name,
+                Description = doc.Description,
+                Genre = doc.Genre,
+                Price = doc.Price,
+                ReleaseDate = doc.ReleaseDate,
+                Rating = doc.Rating
+            }).ToList();
         }
     }
 }

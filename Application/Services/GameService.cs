@@ -63,6 +63,11 @@ namespace Application.Services
             return _elasticService.SearchGamesAsync(request, page, pageSize).Result;
         }
 
+        public List<GameDocument> GetTopRatedGames(int top = 10)
+        {
+            return _elasticService.GetTopRatedGamesAsync(top).Result.ToList();
+        }
+
         public GameResponse AddGame(GameRequest game)
         {
             if (_gameRepository.GetAllGames().Any(g => g.Name == game.Name))

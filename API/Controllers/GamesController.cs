@@ -63,9 +63,23 @@ namespace API.Controllers
         }
 
         /// <summary>
+        /// Returns a list of top-rated games
+        /// </summary>
+        /// <returns>List of Games</returns>
+        [HttpGet("top-rated")]
+        [ProducesResponseType(typeof(IEnumerable<GameResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status500InternalServerError)]
+        public IActionResult GetTopRating([FromQuery] int top)
+        {
+            var games = _gameService.GetTopRatedGames(top);
+            return Ok(games);
+        }
+
+        /// <summary>
         /// Returns a game by id.
         /// </summary>
-        /// <returns>Object User</returns>
+        /// <returns>Object Game</returns> 
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(GameResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
