@@ -22,6 +22,7 @@ namespace FCG.Tests.UnitTests.FCG.Tests.Application.Services
         private readonly Mock<ILoggerService> _loggerServiceMock;
         private readonly Mock<IHttpContextAccessor> _httpContextMock;
         private readonly Mock<IServiceScopeFactory> _scopeFactory;
+        private readonly Mock<IElasticService> _elasticServiceMock;
         private readonly GameService _gameService;
 
 
@@ -31,7 +32,8 @@ namespace FCG.Tests.UnitTests.FCG.Tests.Application.Services
             _loggerServiceMock = new Mock<ILoggerService>();
             _httpContextMock = new Mock<IHttpContextAccessor>();
             _scopeFactory = new Mock<IServiceScopeFactory>();
-            _gameService = new GameService(_gameRepositoryMock.Object, _loggerServiceMock.Object, _httpContextMock.Object, _scopeFactory.Object);
+            _elasticServiceMock = new Mock<IElasticService>();
+            _gameService = new GameService(_gameRepositoryMock.Object, _loggerServiceMock.Object, _httpContextMock.Object, _scopeFactory.Object, _elasticServiceMock.Object);
         }
 
         [Fact]

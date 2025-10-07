@@ -4,9 +4,6 @@ on:
   push:
     branches:
       - '**'
-  pull_request:
-    branches:
-      - '**'
 
 jobs:
   build-test-pushDockerImage:
@@ -74,7 +71,9 @@ jobs:
                 "NEW_RELIC_APP_NAME=${{ vars.NEW_RELIC_APP_NAME }}" \
                 "NewRelic__Enabled=${{ vars.NEW_RELIC_ENABLED }}" \
                 "NewRelic__Endpoint=${{ vars.NEW_RELIC_ENDPOINT }}" \
-                "AspNetCore__Environment=${{ vars.ENV }}"
+                "AspNetCore__Environment=${{ vars.ENV }}" \
+                "ElasticSearch__ServerUrl=${{ vars.ELASTICSEARCH_URL }}" \
+                "ElasticSearch__ApiKey=${{ secrets.ELASTICSEARCH_API_KEY }}"
 
   deploy-uat:
     needs:
@@ -101,7 +100,9 @@ jobs:
                 "NEW_RELIC_APP_NAME=${{ vars.NEW_RELIC_APP_NAME }}" \
                 "NewRelic__Enabled=${{ vars.NEW_RELIC_ENABLED }}" \
                 "NewRelic__Endpoint=${{ vars.NEW_RELIC_ENDPOINT }}" \
-                "AspNetCore__Environment=${{ vars.ENV }}"
+                "AspNetCore__Environment=${{ vars.ENV }}" \
+                "ElasticSearch__ServerUrl=${{ vars.ELASTICSEARCH_URL }}" \
+                "ElasticSearch__ApiKey=${{ secrets.ELASTICSEARCH_API_KEY }}"
 
   deploy-prd:
     needs: 
@@ -130,5 +131,7 @@ jobs:
                 "NEW_RELIC_APP_NAME=${{ vars.NEW_RELIC_APP_NAME }}" \
                 "NewRelic__Enabled=${{ vars.NEW_RELIC_ENABLED }}" \
                 "NewRelic__Endpoint=${{ vars.NEW_RELIC_ENDPOINT }}" \
-                "AspNetCore__Environment=${{ vars.ENV }}"
+                "AspNetCore__Environment=${{ vars.ENV }}" \
+                "ElasticSearch__ServerUrl=${{ vars.ELASTICSEARCH_URL }}" \
+                "ElasticSearch__ApiKey=${{ secrets.ELASTICSEARCH_API_KEY }}"
 
