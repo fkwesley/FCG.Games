@@ -14,21 +14,22 @@ namespace Application.Services
     public class GameService : IGameService
     {
         private readonly IGameRepository _gameRepository;
-        private readonly ILoggerService _loggerService;
         private readonly IHttpContextAccessor _httpContext;
         private readonly IServiceScopeFactory _scopeFactory;
+        private readonly IElasticService _elasticService;
 
         public GameService(
                 IGameRepository gameRepository, 
                 ILoggerService loggerService,
                 IHttpContextAccessor httpContext,
-                IServiceScopeFactory scopeFactory)
+                IServiceScopeFactory scopeFactory,
+                IElasticService elasticService)
         {
             _gameRepository = gameRepository 
                 ?? throw new ArgumentNullException(nameof(gameRepository));
-            _loggerService = loggerService;
             _httpContext = httpContext;
             _scopeFactory = scopeFactory;
+            _elasticService = elasticService;
         }
 
         public async Task<IEnumerable<GameResponse>> GetAllGamesAsync()
@@ -57,6 +58,16 @@ namespace Application.Services
             return gameFound.ToResponse();
         }
 
+        public GameSearchResponse SearchGames(GameSearchRequest request, int page = 0, int pageSize = 10)
+        {
+            return _elasticService.SearchGamesAsync(request, page, pageSize).Result;
+        }
+
+        public List<GameDocument> GetTopRatedGames(int top = 10)
+        {
+            return _elasticService.GetTopRatedGamesAsync(top).Result.ToList();
+        }
+
         public GameResponse AddGame(GameRequest game)
         {
             if (_gameRepository.GetAllGames().Any(g => g.Name == game.Name))
@@ -64,6 +75,10 @@ namespace Application.Services
 
             var gameEntity = game.ToEntity();
             var gameAdded = _gameRepository.AddGame(gameEntity);
+
+            // Indexing the new game in Elasticsearch
+            var gameDocument = gameAdded.ToDocument();
+            _elasticService.IndexAsync(gameDocument, gameDocument.Id).Wait();
 
             return gameAdded.ToResponse();
         }

@@ -1,12 +1,13 @@
-using Azure;
 using API.Middlewares;
-using API.Models;
 using Application.Interfaces;
 using Application.Services;
 using Application.Settings;
 using Domain.Repositories;
+using Elastic.Clients.Elasticsearch;
+using Elastic.Transport;
 using Infrastructure.Context;
 using Infrastructure.Repositories;
+using Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -15,6 +16,7 @@ using Microsoft.OpenApi.Models;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
+using ErrorResponse = API.Models.ErrorResponse;
 
 #region initializing
 var builder = WebApplication.CreateBuilder(args);
@@ -130,6 +132,7 @@ builder.Services.AddSingleton<IPasswordHasherRepository, PasswordHasherRepositor
 //services
 builder.Services.AddScoped<IGameService, GameService>();
 builder.Services.AddScoped<ILoggerService, LoggerService>();
+builder.Services.AddSingleton<IElasticService, ElasticService>();
 
 //repositories
 builder.Services.AddScoped<IGameRepository, GameRepository>();
@@ -139,8 +142,26 @@ builder.Services.AddScoped<INewRelicLoggerRepository, NewRelicLoggerRepository>(
 // Register the DbContext with dependency injection
 builder.Services.AddDbContext<GamesDbContext>(options =>
 {
-    options.UseSqlServer(connectionString);
+    options.UseSqlServer(connectionString, sqlOptions =>
+    {
+        sqlOptions.EnableRetryOnFailure(
+            maxRetryCount: 3,
+            maxRetryDelay: TimeSpan.FromSeconds(30),
+            errorNumbersToAdd: null
+        );
+    });
 }, ServiceLifetime.Scoped);
+#endregion
+
+#region elasticsearch
+var elasticUrl = builder.Configuration["ElasticSearch:ServerUrl"];
+var apiKey = builder.Configuration["ElasticSearch:ApiKey"];
+
+var settings = new ElasticsearchClientSettings(new Uri(uriString: elasticUrl))
+    .Authentication(new ApiKey(apiKey)) 
+    .DefaultIndex("games"); // define índice padrão, opcional
+
+builder.Services.AddSingleton(new ElasticsearchClient(settings));
 #endregion
 
 #region otherServices

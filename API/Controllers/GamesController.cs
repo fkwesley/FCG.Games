@@ -34,9 +34,52 @@ namespace API.Controllers
         }
 
         /// <summary>
-        /// Returms a game by id.
+        /// Returns a list of games matching the search criteria.
         /// </summary>
-        /// <returns>Object User</returns>
+        /// <returns>List of Games</returns>
+        [HttpGet("search")]
+        [ProducesResponseType(typeof(IEnumerable<GameResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status500InternalServerError)]
+        public IActionResult Search([FromQuery] string? name, 
+                                                string? genre, 
+                                                string? releaseDateFrom, string? releaseDateTo,
+                                                decimal? priceFrom, decimal? priceTo,
+                                                bool IncludeAggregations = false)
+        {
+            GameSearchRequest request = new GameSearchRequest()
+            {
+                Name = name,
+                Genre = genre,
+                ReleaseDateFrom = releaseDateFrom == null ? null : DateTime.Parse(releaseDateFrom),
+                ReleaseDateTo = releaseDateTo == null ? null : DateTime.Parse(releaseDateTo),
+                PriceFrom = priceFrom,
+                PriceTo = priceTo,
+                IncludeAggregations = IncludeAggregations
+            };
+
+            var games = _gameService.SearchGames(request);
+            return Ok(games);
+        }
+
+        /// <summary>
+        /// Returns a list of top-rated games
+        /// </summary>
+        /// <returns>List of Games</returns>
+        [HttpGet("top-rated")]
+        [ProducesResponseType(typeof(IEnumerable<GameResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status500InternalServerError)]
+        public IActionResult GetTopRating([FromQuery] int top)
+        {
+            var games = _gameService.GetTopRatedGames(top);
+            return Ok(games);
+        }
+
+        /// <summary>
+        /// Returns a game by id.
+        /// </summary>
+        /// <returns>Object Game</returns> 
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(GameResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]

@@ -40,5 +40,21 @@ namespace Application.Mappings
                 Rating = entity.Rating
             };
         }
+
+        /// <summary>
+        /// Maps a Game to a GameDocument.
+        public static GameDocument ToDocument(this Game entity)
+        {
+            return new GameDocument
+            {
+                Id = entity.GameId.ToString(),
+                Name = entity.Name,
+                Description = entity.Description,
+                Genre = entity.Genre,
+                Price = entity.Price,
+                ReleaseDate = entity.ReleaseDate,
+                Rating = entity.Rating,
+            };
+        }
     }
 }
