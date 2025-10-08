@@ -1,9 +1,10 @@
-﻿# 🎮 FCG.FiapCloudGames.API
+﻿# 🎮 FCG.Games.API
 
-API desenvolvida para gerenciamento de usuários e jogos, com foco em boas práticas de arquitetura DDD, autenticação segura, validação robusta e testes automatizados.
+API desenvolvida para gerenciamento de jogos, com foco em micro-serviços e arquitetura orientada a eventos.
 - Hospedada na Azure usando Container Apps e imagem publicada no ACR (Azure Container Registry).
 - [Vídeo com a apresentação da Fase 1](https://youtu.be/bmRaU8VjJZU)
 - [Vídeo com a apresentação da Fase 2](https://youtu.be/BXBc6JKnRpw)
+- [Vídeo com a apresentação da Fase 3]()
 
 ## 📌 Objetivo
 
@@ -36,7 +37,18 @@ Desenvolver uma API RESTful robusta e escalável, aplicando:
     - Traces no New Relic
     - Logs no New Relic
     - Dashboards de monitoramento (New Relic e Azure)
-
+### **Fase 3:** 
+  - **Migração arquitetura Monolitica x Micro-serviços:**
+    - Separação da API em dois serviços distintos com base nos contextos delimitados (Users, Games, Orders, Payments)
+    - Cada API com seu próprio repositório e infraestrutura (banco de dados, container app e pipeline CI/CD)
+  - **Adoção de soluções Serverless:**
+    - Arquitetura orientada a eventos com comunicação assíncrona via mensageria (Azure Service Bus)
+    - Utilização de Azure Functions como gatilho das mensagens do Service Bus (Tópicos e Subscriptions)
+    - Utilização do Azure API Management para gerenciamento e segurança das APIs com políticas de rate limit e cache
+  - **Otimização na busca de jogos:**
+    - Implementação de ElasticSearch para indexação dos jogos e logs 
+    - Ganho de performance com consultas avançadas
+    - Implementação de filtros, paginação e ordenação, inclusive endpoint de jogos mais bem avaliados
 
 ## 🚀 Tecnologias Utilizadas
 
@@ -45,7 +57,7 @@ Desenvolver uma API RESTful robusta e escalável, aplicando:
 | .NET              | .NET 8                           |
 | C#                | 12                               |
 | Entity Framework  | Core, com Migrations             |
-| Banco de Dados    | SQL Server (ou SQLite para testes) |
+| Banco de Dados    | SQL Server                       |
 | Autenticação      | JWT (Bearer Token)               |
 | Testes            | xUnit, Moq, FluentAssertions     |
 | Swagger           | Swashbuckle.AspNetCore           |
@@ -53,6 +65,13 @@ Desenvolver uma API RESTful robusta e escalável, aplicando:
 | Logger            | Middleware de Request/Response + LogId |
 | Docker            | Multi-stage Dockerfile para build e runtime |
 | Monitoramento     | New Relic (.NET Agent) + Azure |
+| Mensageria        | Azure Service Bus (Tópicos e Subscriptions) |
+| Consumer de Mensagens | Azure Functions                  |
+| Orquestração      | Azure Container Apps             |
+| API Gateway       | Azure API Management             |
+| CI/CD             | GitHub Actions                   |
+| Testes de Carga   | K6                               |
+| ElasticSearch    | Indexação e busca avançada       |
 
 
 ## 🧠 Padrões e Boas Práticas
@@ -66,35 +85,25 @@ Desenvolver uma API RESTful robusta e escalável, aplicando:
 
 ## ✅ Principais Funcionalidades
 
-### Usuários
-- ✅ Criação de usuários
-- ✅ Autenticação com JWT
-- ✅ Hash seguro de senhas com salt
-- ✅ Verificação de senha no login
-- ✅ Validação de senha forte
-- ✅ Validação de formato de e-mail
-- ✅ Controle de permissões (admin)
-
 ### Jogos
-- ✅ Cadastro e listagem de jogos
-- ✅ Validação de campos e tamanho máximo
-- ✅ Validação de gênero permitido
-- ✅ Validação de quantidade mínima de dados enviados
+- ✅ Criação de jogos + Disparo para fila de pagamento de forma assíncrona
+- ✅ Listagem de jogos
+- ✅ Consulta de jogo por id
+- ✅ Consulta avançada de jogos com filtros, Fuzzy Search, paginação e ordenação (com ElasticSearch)
+- ✅ Atualização de status dos jogos
+- ✅ Cancelamento de jogos
+- ✅ Relatório de jogos mais bem avaliados (com ElasticSearch)
 
 ### Segurança e Middleware
 - ✅ Middleware de erro global
 - ✅ Retorno padronizado com `ErrorResponse`
 - ✅ Registro de logs com `RequestId` único
-- ✅ Token JWT com verificação de permissões por endpoint
-
+- ✅ Autenticação com Token JWT gerado pela [FCG.Users.API](https://github.com/fkwesley/FCG.Users) 
+- ✅ Verificação de permissões por endpoint
 
 ## 🧪 Testes
 
-- ✅ Testes unitários completos de:
-  - Regras de domínio
-  - Hash de senhas
-  - Autenticação
-  - Serviços e repositórios mockados
+- ✅ Testes unitários completos
 - ✅ Cobertura de cenários felizes e inválidos
 - ✅ Testes de carga e performance (utilizando K6)
   ```bash
@@ -113,13 +122,14 @@ Siga esses passos para configurar e rodar o projeto localmente:
 ### 
 - Clonar o repositório
   ```bash
-  git clone https://github.com/seu-usuario/fiap-cloud-games.git
+  git clone https://github.com/fkwesley/FCG.Games.git
   ```
-- Configurar a conexão com o banco de dados no `appsettings.json` ou nas variáveis de ambiente
+- Configurar conexões com o banco de dados e servicebus no `appsettings.json` ou nas variáveis de ambiente
   ```json
   {
     "ConnectionStrings": {
-      "DefaultConnection": "Server=(localdb)\\mssqllocaldb;Database=FiapCloudGamesDb;Trusted_Connection=True;"
+      "DefaultConnection": "Server=(localdb)\\mssqllocaldb;Database=FiapCloudGamesDb;Trusted_Connection=True;",
+      "ServiceBusConnection": "Endpoint=sb://<NAMESPACE>.servicebus.windows.net/;SharedAccessKeyName=<KEY_NAME>;SharedAccessKey=<KEY_VALUE>"
     },
     "Jwt": {
       "Key": "sua-chave-secreta-supersegura",
@@ -130,7 +140,7 @@ Siga esses passos para configurar e rodar o projeto localmente:
   ```
 - Executar as migrations para criar o banco de dados, passando a connectionString
   ```bash
-  Update-Database -Project FCG.Infrastructure -StartupProject FCG.API -Connection "Server=(localdb)\(instance);Database=FiapCloudGamesDb;Trusted_Connection=True;TrustServerCertificate=True"
+  Update-Database -Project Infrastructure -StartupProject API -Connection "Server=(server)\(instance);Database=(dbname);Trusted_Connection=True;TrustServerCertificate=True"
   ```
 - Rodar Testes
   ```bash
@@ -138,28 +148,28 @@ Siga esses passos para configurar e rodar o projeto localmente:
   ```
 - Executar a aplicação
   ```bash
-  dotnet run --project FCG.API
+  dotnet run --project API
   ```
 - Acessar a documentação Swagger em `http://localhost:<porta>/swagger/index.html`
 
 
  ## 🔐 Autenticação e Autorização
 
-- Faça login com um usuário existente via /auth/login
+- Faça login com um usuário existente via users/auth/login
 - Use o token Bearer retornado no header Authorization das demais requisições protegidas.
 
 
  ## 📁 Estrutura de Pastas
 
  ```bash
-FCG.FiapCloudGames/
+FCG.Games.API/
 │
-├── FCG.API/                        # Camada de apresentação (Controllers, Middlewares, Program.cs)
+├── API/                        # Camada de apresentação (Controllers, Middlewares, Program.cs)
 │   ├── Controllers/                # Endpoints REST
 │   ├── Middleware/                 # Tratamento de erros, logs, etc.
 │   └── Program.cs                  # Ponto de entrada da aplicação
 │
-├── FCG.Application/                # Camada de aplicação (DTOs, serviços, interfaces de uso)
+├── Application/                # Camada de aplicação (DTOs, serviços, interfaces de uso)
 │   ├── Interfaces/                 # Interfaces usadas pela API
 │   ├── Services/                   # Serviços que coordenam o domínio
 │   └── DTOs/                       # Objetos de transferência de dados
@@ -168,59 +178,60 @@ FCG.FiapCloudGames/
 │   └── Mappings/                   # Mapeamentos entre DTOs e entidades
 │   └── Settings/                   # Configurações da aplicação
 │
-├── FCG.Domain/                     # Camada de domínio (regra de negócio, entidades, contratos)
+├── Domain/                     # Camada de domínio (regra de negócio, entidades, contratos)
 │   ├── Entities/                   # Entidades como User e Game
 │   ├── Exceptions/                 # Exceções do domínio
 │   ├── Repositories/               # Interfaces dos repositórios (sem dependência de EF)
 │
-├── FCG.Infrastructure/             # Implementações (EF, hashing, repositórios concretos)
+├── Infrastructure/             # Implementações (EF, hashing, repositórios concretos)
+│   ├── Configurations/             # Configurações do EF (ex: SqlServerConfig)
 │   ├── Context/                    # DbContext do Entity Framework
+│   ├── Interfaces/                 # Interfaces de serviços externos
 │   ├── Mappings/                   # Configurações de entidades (Fluent API)
 │   ├── Repositories/               # Repositórios que implementam a camada de domínio
 │   └── Migrations/                 # Histórico de migrations geradas
+│   └── Services/                   # Implementações de serviços externos/infra (ex: ServiceBusService)
 │
-├── FCG.Tests/                      # Testes automatizados (xUnit)
+├── Tests/                      # Testes automatizados (xUnit)
 │   ├── UnitTests/                  # Testes Unitários
 │       ├── Domain/                 # Testes de entidades, regex e regras
 │       ├── Application/            # Testes de serviços (ex: UserService)
 │       ├── Infrastructure/         # Testes de hashing, token, etc.
 │       └── Helpers/                # Setup de mocks e objetos fake
-│   ├── IntegrationTests/           # Testes de Integração
 │
-├── FCG.Documentation/              # Documentação do projeto
-├── .github/                        # Configurações do GitHub Actions para CI/CD
+├── Documentation/              # Documentação do projeto
+├── .github/                    # Configurações do GitHub Actions para CI/CD
 │
-├── .gitattributes                  # Configurações do Git
-├── .gitigore                       # Arquivo para ignorar arquivos no Git
-├── load-test.js                    # Script de teste de carga com K6
-├── Dockerfile                      # Dockerfile para containerização
-├── README.md                       # Este arquivo
+├── .gitattributes              # Configurações do Git
+├── .gitigore                   # Arquivo para ignorar arquivos no Git
+├── load-test.js                # Script de teste de carga com K6
+├── Dockerfile                  # Dockerfile para containerização
+├── README.md                   # Este arquivo
 └── 
  ```
 
 
 ## 🔗 Diagrama de Relacionamento (Simplificado)
 ```plaintext
-+------------------+           +--------------------+           +------------------+            +------------------+
-|     Users        |<--------->|   Request_log      |<--------->|    Trace_log     |            |      Games       |
-+------------------+   (1:N)   +--------------------+   (1:N)   +------------------+            +------------------+
-| UserId (PK)      |           | LogId (PK)         |           | TraceId (PK)     |            | GameId (PK)      |
-| Name             |           | UserId (FK)        |           | LogId (FK)       |            | Name             |
-| Email            |           | HttpMethod         |           | Timestamp        |            | Description      |
-| PasswordHash     |           | Path               |           | Level            |            | Genre            |
-| IsActive         |           | StatusCode         |           | Message          |            | ReleaseDate      |
-| CreatedAt        |           | RequestBody        |           | StackTrace       |            | CreatedAt        |
-| UpdatedAt        |           | ResponseBody       |           +------------------+            | UpdatedAt        |
-| IsAdmin          |           | StartDate          |                                           | Rating           |
-+------------------+           | EndDate            |                                           +------------------+ 
-                               | Duration           |
-                               +--------------------+       
++--------------------+           +------------------+        +------------------+
+|   Request_log      |<--------->|    Trace_log     |        |      Games       |
++--------------------+   (1:N)   +------------------+        +------------------+
+| LogId (PK)         |           | TraceId (PK)     |        | GameId (PK)      |
+| UserId (FK)        |           | LogId (FK)       |        | Name             |
+| HttpMethod         |           | Timestamp        |        | Description      |
+| Path               |           | Level            |        | Genre            |
+| StatusCode         |           | Message          |        | ReleaseDate      |
+| RequestBody        |           | StackTrace       |        | CreatedAt        |
+| ResponseBody       |           +------------------+        | UpdatedAt        |     
+| StartDate          |                                       | Rating           |
+| Duration           |                                       | Price            |
++--------------------+                                       +------------------+
 ```
 
 
 ## 🚀 Pipeline CI/CD
 
-O workflow está definido em `.github/workflows/ci-cd-fcg.yml`. 
+O workflow está definido em `.github/workflows/ci-cd.yml`. 
 Automatizando os seguintes passos:
 
 - Build e testes unitários
@@ -237,12 +248,15 @@ Automatizando os seguintes passos:
 O projeto utiliza os seguintes recursos na Azure:
 
 - **Azure Resource Group**: `RG_FCG`
-- **Azure SQL Database**: `fiapcloudgamesdb`
+- **Azure SQL Database**: `FCG.GamesDB`
 - **Azure Container Registry (ACR)**: `acrfcg.azurecr.io`
 - **Azure Container Apps**:
-  - DEV: `aca-fcg-dev` 
-  - UAT: `aca-fcg-uat` 
-  - PRD: `aca-fcg` 
+  - DEV: `aca-fcg-games-dev` 
+  - UAT: `aca-fcg-games-uat` 
+  - PRD: `aca-fcg-games`
+- **Azure Api Management**: `apim-fcg`
+- **Azure Service Bus**: `servicebus-fcg`
+- **Azure Functions**: `func-fcg-payments`
 
 As variáveis de ambiente sensíveis (como strings de conexão) são gerenciadas via Azure e GitHub Secrets.
 [Link para o desenho de infraestrutura](https://miro.com/app/board/uXjVIteOb6w=/?share_link_id=230805148396)
