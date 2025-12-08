@@ -3,37 +3,98 @@ kind: Ingress
 metadata:
   name: fcg-ingress
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /$1
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
 spec:
   ingressClassName: nginx
   rules:
-  - http:
-      paths:
-      - path: /users
-        pathType: Prefix
-        backend:
-          service:
-            name: fcg-users-svc
-            port:
-              number: 80
-      - path: /games
-        pathType: Prefix
-        backend:
-          service:
-            name: fcg-games-svc
-            port:
-              number: 80
-      - path: /orders
-        pathType: Prefix
-        backend:
-          service:
-            name: fcg-orders-svc
-            port:
-              number: 80
-      - path: /payments
-        pathType: Prefix
-        backend:
-          service:
-            name: fcg-payments-svc
-            port:
-              number: 80
+    - http:
+        paths:
+          # DEV environment
+          - path: /dev/users
+            pathType: Prefix
+            backend:
+              service:
+                name: fcg-users-svc
+                port:
+                  number: 80
+          - path: /dev/games
+            pathType: Prefix
+            backend:
+              service:
+                name: fcg-games-svc
+                port:
+                  number: 80
+          - path: /dev/orders
+            pathType: Prefix
+            backend:
+              service:
+                name: fcg-orders-svc
+                port:
+                  number: 80
+          - path: /dev/payments
+            pathType: Prefix
+            backend:
+              service:
+                name: fcg-payments-svc
+                port:
+                  number: 80
+
+          # UAT environment
+          - path: /uat/users
+            pathType: Prefix
+            backend:
+              service:
+                name: fcg-users-svc
+                port:
+                  number: 80
+          - path: /uat/games
+            pathType: Prefix
+            backend:
+              service:
+                name: fcg-games-svc
+                port:
+                  number: 80
+          - path: /uat/orders
+            pathType: Prefix
+            backend:
+              service:
+                name: fcg-orders-svc
+                port:
+                  number: 80
+          - path: /uat/payments
+            pathType: Prefix
+            backend:
+              service:
+                name: fcg-payments-svc
+                port:
+                  number: 80
+
+          # PROD environment (sem prefixo)
+          - path: /users
+            pathType: Prefix
+            backend:
+              service:
+                name: fcg-users-svc
+                port:
+                  number: 80
+          - path: /games
+            pathType: Prefix
+            backend:
+              service:
+                name: fcg-games-svc
+                port:
+                  number: 80
+          - path: /orders
+            pathType: Prefix
+            backend:
+              service:
+                name: fcg-orders-svc
+                port:
+                  number: 80
+          - path: /payments
+            pathType: Prefix
+            backend:
+              service:
+                name: fcg-payments-svc
+                port:
+                  number: 80
