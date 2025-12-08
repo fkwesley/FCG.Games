@@ -5,11 +5,11 @@ metadata:
   name: fcg-games-svc       # Nome do Service
 
 spec:
-  type: LoadBalancer        # Tipo LoadBalancer: cria um IP público para acesso externo
+  type: ClusterIP           # Tipo ClusterIP: cria um IP interno para acesso interno
 
   selector:
     app: fcg-games          # O selector conecta este Service aos Pods com este label
 
   ports:                    # Mapeamento de portas
-    - port: 80              # Porta pública exposta no Service
+    - port: 80              # Porta interna exposta no Service
       targetPort: 8080      # Porta interna do container
