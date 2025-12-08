@@ -70,6 +70,9 @@ jobs:
         
       - name: Apply Namespaces
         run: kubectl apply -f Kubernetes/namespace.yaml
+      
+      - name: Apply Ingress
+        run: kubectl apply -f Kubernetes/ingress.yaml -n fcg-dev
 
       - name: Apply ConfigMap and Secret
         run: |
@@ -112,6 +115,9 @@ jobs:
         
       - name: Apply Namespaces
         run: kubectl apply -f Kubernetes/namespace.yaml
+      
+      - name: Apply Ingress
+        run: kubectl apply -f Kubernetes/ingress.yaml -n fcg-uat
 
       - name: Apply ConfigMap and Secret
         run: |
@@ -156,6 +162,9 @@ jobs:
         
       - name: Apply Namespaces
         run: kubectl apply -f Kubernetes/namespace.yaml
+      
+      - name: Apply Ingress
+        run: kubectl apply -f Kubernetes/ingress.yaml -n fcg
 
       - name: Apply ConfigMap and Secret
         run: |
