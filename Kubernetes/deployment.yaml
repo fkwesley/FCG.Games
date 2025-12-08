@@ -1,0 +1,72 @@
+apiVersion: apps/v1                                                         # Versão da API do Kubernetes usada para criar Deployments
+kind: Deployment                                                            # Tipo do objeto: Deployment cria réplicas e faz rollout
+metadata:
+  name: fcg-games                                                           # Nome do Deployment
+
+spec:
+  replicas: 1                                                               # Quantas réplicas (pods) deseja rodar
+  selector:                                                                 # Selector: identifica quais pods pertencem a este Deployment
+    matchLabels:
+      app: fcg-games
+
+  template:                                                                 # Template: modelo usado para criar cada Pod
+    metadata:
+      labels:                                                               # Labels aplicadas nos Pods criados
+        app: fcg-games
+
+    spec:
+      containers:                                                           # Lista de containers dentro do Pod
+        - name: fcg-users-container                                         # Nome do container
+          image: acrfcg.azurecr.io/fiapcloudgames/games/api:${IMAGE_TAG}    # Imagem do container no ACR
+          ports:                                                            # Porta exposta internamente no container
+            - containerPort: 8080
+          env:
+            # from ConfigMap
+            - name: NEW_RELIC_APP_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: fcg-games-config
+                  key: NEW_RELIC_APP_NAME
+
+            - name: NewRelic__Enabled
+              valueFrom:
+                configMapKeyRef:
+                  name: fcg-games-config
+                  key: NewRelic__Enabled
+
+            - name: NewRelic__Endpoint
+              valueFrom:
+                configMapKeyRef:
+                  name: fcg-games-config
+                  key: NewRelic__Endpoint
+
+            - name: AspNetCore_Environment
+              valueFrom:
+                configMapKeyRef:
+                  name: fcg-games-config
+                  key: AspNetCore_Environment
+
+            - name: ElasticSearch__ServerUrl
+              valueFrom:
+                configMapKeyRef:
+                  name: fcg-games-config
+                  key: ElasticSearch__ServerUrl
+
+            # from Secret
+            - name: ConnectionStrings__FCGUsersDbConnection
+              valueFrom:
+                secretKeyRef:
+                  name: fcg-games-secret
+                  key: ConnectionStrings__FCGUsersDbConnection
+
+            - name: NewRelic__LicenseKey
+              valueFrom:
+                secretKeyRef:
+                  name: fcg-games-secret
+                  key: NewRelic__LicenseKey
+
+            - name: ElasticSearch__ApiKey
+              valueFrom:
+                secretKeyRef:
+                  name: fcg-games-secret
+                  key: ElasticSearch__ApiKey

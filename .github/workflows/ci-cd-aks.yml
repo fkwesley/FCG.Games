@@ -1,0 +1,178 @@
+name: CI/CD - FCG.Games - AKS
+
+on:
+  push:
+    branches:
+      - '**'
+    paths-ignore:
+      - '**/README.md'
+      - 'Documentation/**'
+
+jobs:
+  build-test-pushDockerImage:
+    runs-on: ubuntu-latest
+    outputs:
+      image_tag: ${{ steps.set_tag.outputs.image_tag }}
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+          
+      - name: Setup .NET 8.0
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Restore
+        run: dotnet restore FCG.Games.sln
+
+      - name: Build
+        run: dotnet build FCG.Games.sln --configuration Release --no-restore
+
+      - name: Unit Tests with Coverage
+        run: dotnet test FCG.Games.sln --configuration Release --no-build --verbosity normal --collect:"XPlat Code Coverage"
+
+      - name: Login to Azure Container Registry
+        run: echo ${{ secrets.AZURE_ACR_PASSWORD }} | docker login acrfcg.azurecr.io -u ${{ secrets.AZURE_ACR_USERNAME }} --password-stdin
+
+      - name: Set Docker Image Tag
+        id: set_tag
+        run: |
+          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
+          echo "image_tag=${SHORT_SHA}" >> $GITHUB_OUTPUT
+
+      - name: Build Docker image
+        run: |
+          docker build -t acrfcg.azurecr.io/fiapcloudgames/games/api:latest \
+                       -t acrfcg.azurecr.io/fiapcloudgames/games/api:${{ steps.set_tag.outputs.image_tag }} .
+
+      - name: Push Docker image to ACR
+        run: |
+          docker push acrfcg.azurecr.io/fiapcloudgames/games/api:latest
+          docker push acrfcg.azurecr.io/fiapcloudgames/games/api:${{ steps.set_tag.outputs.image_tag }}
+          
+  deploy-dev:
+    needs: build-test-pushDockerImage
+    runs-on: ubuntu-latest
+    environment: DEV
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Set AKS context
+        run: az aks get-credentials --resource-group RG_FCG --name aks-fcg --overwrite-existing
+        
+      - name: Apply Namespaces
+        run: kubectl apply -f Kubernetes/namespace.yaml
+
+      - name: Apply ConfigMap and Secret
+        run: |
+             export FCG_DB_CONNECTION_STRING="${{ secrets.FCG_DB_CONNECTION_STRING }}"
+             export NEW_RELIC_LICENSE_KEY="${{ secrets.NEW_RELIC_LICENSE_KEY }}"
+             export NEW_RELIC_APP_NAME="${{ vars.NEW_RELIC_APP_NAME }}"
+             export NEW_RELIC_ENABLED="${{ vars.NEW_RELIC_ENABLED }}"
+             export NEW_RELIC_ENDPOINT="${{ vars.NEW_RELIC_ENDPOINT }}"
+             export ENV="${{ vars.ENV }}"
+             export ELASTICSEARCH_URL="${{ vars.ELASTICSEARCH_URL }}"
+             export ELASTICSEARCH_API_KEY="${{ secrets.ELASTICSEARCH_API_KEY }}"
+             envsubst < Kubernetes/configmap.yaml | kubectl apply -n fcg-dev -f -           # aplica o configmap com substituição de variáveis
+             envsubst < Kubernetes/secret.yaml | kubectl apply -n fcg-dev -f -              # aplica o secret com substituição de variáveis
+
+      - name: Deploy to AKS - DEV
+        run: |
+             export IMAGE_TAG="${{ needs.build-test-pushDockerImage.outputs.image_tag }}"   # tag da imagem Docker
+             envsubst < Kubernetes/deployment.yaml | kubectl apply -n fcg-dev -f -          # aplica o deployment com substituição de variáveis
+             kubectl apply -f Kubernetes/service.yaml -n fcg-dev                            # aplica o service
+             kubectl rollout status deployment/fcg-games -n fcg-dev                         # aguarda o rollout completar
+
+  deploy-uat:
+    needs:
+      - build-test-pushDockerImage
+      - deploy-dev
+    runs-on: ubuntu-latest
+    environment: UAT
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Set AKS context
+        run: az aks get-credentials --resource-group RG_FCG --name aks-fcg --overwrite-existing
+        
+      - name: Apply Namespaces
+        run: kubectl apply -f Kubernetes/namespace.yaml
+
+      - name: Apply ConfigMap and Secret
+        run: |
+             export FCG_DB_CONNECTION_STRING="${{ secrets.FCG_DB_CONNECTION_STRING }}"
+             export NEW_RELIC_LICENSE_KEY="${{ secrets.NEW_RELIC_LICENSE_KEY }}"
+             export NEW_RELIC_APP_NAME="${{ vars.NEW_RELIC_APP_NAME }}"
+             export NEW_RELIC_ENABLED="${{ vars.NEW_RELIC_ENABLED }}"
+             export NEW_RELIC_ENDPOINT="${{ vars.NEW_RELIC_ENDPOINT }}"
+             export ENV="${{ vars.ENV }}"
+             export ELASTICSEARCH_URL="${{ vars.ELASTICSEARCH_URL }}"
+             export ELASTICSEARCH_API_KEY="${{ secrets.ELASTICSEARCH_API_KEY }}"
+             envsubst < Kubernetes/configmap.yaml | kubectl apply -n fcg-uat -f -           # aplica o configmap com substituição de variáveis
+             envsubst < Kubernetes/secret.yaml | kubectl apply -n fcg-uat -f -              # aplica o secret com substituição de variáveis
+
+      - name: Deploy to AKS - UAT
+        run: |
+             export IMAGE_TAG="${{ needs.build-test-pushDockerImage.outputs.image_tag }}"   # tag da imagem Docker
+             envsubst < Kubernetes/deployment.yaml | kubectl apply -n fcg-uat -f -          # aplica o deployment com substituição de variáveis
+             kubectl apply -f Kubernetes/service.yaml -n fcg-uat                            # aplica o service
+             kubectl rollout status deployment/fcg-users -n fcg-uat                         # aguarda o rollout completar
+
+  deploy-prd:
+    needs:
+      - build-test-pushDockerImage
+      - deploy-dev
+      - deploy-uat
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    environment: PRD
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Set AKS context
+        run: az aks get-credentials --resource-group RG_FCG --name aks-fcg --overwrite-existing
+        
+      - name: Apply Namespaces
+        run: kubectl apply -f Kubernetes/namespace.yaml
+
+      - name: Apply ConfigMap and Secret
+        run: |
+             export FCG_DB_CONNECTION_STRING="${{ secrets.FCG_DB_CONNECTION_STRING }}"
+             export NEW_RELIC_LICENSE_KEY="${{ secrets.NEW_RELIC_LICENSE_KEY }}"
+             export NEW_RELIC_APP_NAME="${{ vars.NEW_RELIC_APP_NAME }}"
+             export NEW_RELIC_ENABLED="${{ vars.NEW_RELIC_ENABLED }}"
+             export NEW_RELIC_ENDPOINT="${{ vars.NEW_RELIC_ENDPOINT }}"
+             export ENV="${{ vars.ENV }}"
+             export ELASTICSEARCH_URL="${{ vars.ELASTICSEARCH_URL }}"
+             export ELASTICSEARCH_API_KEY="${{ secrets.ELASTICSEARCH_API_KEY }}"
+             envsubst < Kubernetes/configmap.yaml | kubectl apply -n fcg -f -           # aplica o configmap com substituição de variáveis
+             envsubst < Kubernetes/secret.yaml | kubectl apply -n fcg -f -              # aplica o secret com substituição de variáveis
+
+      - name: Deploy to AKS - PRD
+        run: |
+             export IMAGE_TAG="${{ needs.build-test-pushDockerImage.outputs.image_tag }}"   # tag da imagem Docker
+             envsubst < Kubernetes/deployment.yaml | kubectl apply -n fcg -f -          # aplica o deployment com substituição de variáveis
+             kubectl apply -f Kubernetes/service.yaml -n fcg                            # aplica o service
+             kubectl rollout status deployment/fcg-games -n fcg                         # aguarda o rollout completar

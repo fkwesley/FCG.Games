@@ -23,6 +23,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 var configuration = new ConfigurationBuilder()
     .AddJsonFile("appsettings.json")
+    .AddEnvironmentVariables()
     .Build();
 
 var jwtKey = configuration["Jwt:Key"];
