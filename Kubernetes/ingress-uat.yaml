@@ -22,17 +22,17 @@ spec:
                 name: fcg-games-svc
                 port:
                   number: 80
-          - path: /uat/orders
-            pathType: Prefix
-            backend:
-              service:
-                name: fcg-orders-svc
-                port:
-                  number: 80
-          - path: /uat/payments
-            pathType: Prefix
-            backend:
-              service:
-                name: fcg-payments-svc
-                port:
-                  number: 80
+          # - path: /uat/orders
+          #   pathType: Prefix
+          #   backend:
+          #     service:
+          #       name: fcg-orders-svc
+          #       port:
+          #         number: 80
+          # - path: /uat/payments
+          #   pathType: Prefix
+          #   backend:
+          #     service:
+          #       name: fcg-payments-svc
+          #       port:
+          #         number: 80
