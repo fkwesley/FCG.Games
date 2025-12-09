@@ -7,16 +7,15 @@ spec:
   rules:
     - http:
         paths:
-          # PROD environment (sem prefixo)
-          - path: /users
-            pathType: Prefix
+          - path: /users-api/?(.*)
+            pathType: ImplementationSpecific
             backend:
               service:
                 name: fcg-users-svc
                 port:
                   number: 80
-          - path: /games
-            pathType: Prefix
+          - path: /games-api/?(.*)
+            pathType: ImplementationSpecific
             backend:
               service:
                 name: fcg-games-svc

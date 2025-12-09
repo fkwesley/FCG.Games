@@ -7,16 +7,15 @@ spec:
   rules:
     - http:
         paths:
-          # UAT environment
-          - path: /uat/users
-            pathType: Prefix
+          - path: /uat/users-api/?(.*)
+            pathType: ImplementationSpecific
             backend:
               service:
                 name: fcg-users-svc
                 port:
                   number: 80
-          - path: /uat/games
-            pathType: Prefix
+          - path: /uat/games-api/?(.*)
+            pathType: ImplementationSpecific
             backend:
               service:
                 name: fcg-games-svc

@@ -7,16 +7,15 @@ spec:
   rules:
     - http:
         paths:
-          # DEV environment
-          - path: /dev/users
-            pathType: Prefix
+          - path: /dev/users-api/?(.*)
+            pathType: ImplementationSpecific
             backend:
               service:
                 name: fcg-users-svc
                 port:
                   number: 80
-          - path: /dev/games
-            pathType: Prefix
+          - path: /dev/games-api/?(.*)
+            pathType: ImplementationSpecific
             backend:
               service:
                 name: fcg-games-svc
