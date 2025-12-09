@@ -66,13 +66,13 @@ jobs:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: Set AKS context
-        run: az aks get-credentials --resource-group RG_FCG --name aks-fcg --overwrite-existing
+        run: az aks get-credentials --resource-group RG_FCG --name aks-fcg-games --overwrite-existing
         
       - name: Apply Namespaces
         run: kubectl apply -f Kubernetes/namespace.yaml
       
-      - name: Apply Ingress
-        run: kubectl apply -f Kubernetes/ingress-dev.yaml -n fcg-dev
+      # - name: Apply Ingress
+      #   run: kubectl apply -f Kubernetes/ingress-dev.yaml -n fcg-dev
 
       - name: Apply ConfigMap and Secret
         run: |
@@ -111,13 +111,13 @@ jobs:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: Set AKS context
-        run: az aks get-credentials --resource-group RG_FCG --name aks-fcg --overwrite-existing
+        run: az aks get-credentials --resource-group RG_FCG --name aks-fcg-games --overwrite-existing
         
       - name: Apply Namespaces
         run: kubectl apply -f Kubernetes/namespace.yaml
       
-      - name: Apply Ingress
-        run: kubectl apply -f Kubernetes/ingress-uat.yaml -n fcg-uat
+      # - name: Apply Ingress
+      #   run: kubectl apply -f Kubernetes/ingress-uat.yaml -n fcg-uat
 
       - name: Apply ConfigMap and Secret
         run: |
@@ -158,13 +158,13 @@ jobs:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: Set AKS context
-        run: az aks get-credentials --resource-group RG_FCG --name aks-fcg --overwrite-existing
+        run: az aks get-credentials --resource-group RG_FCG --name aks-fcg-games --overwrite-existing
         
       - name: Apply Namespaces
         run: kubectl apply -f Kubernetes/namespace.yaml
       
-      - name: Apply Ingress
-        run: kubectl apply -f Kubernetes/ingress.yaml -n fcg
+      # - name: Apply Ingress
+      #   run: kubectl apply -f Kubernetes/ingress.yaml -n fcg
 
       - name: Apply ConfigMap and Secret
         run: |
