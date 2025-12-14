@@ -9,20 +9,26 @@ spec:
     name: fcg-games
 
   minReplicas: 1
-  maxReplicas: 3
-
+  maxReplicas: 10
+  
   metrics:
   - type: Resource
     resource:
       name: cpu
       target:
         type: Utilization
-        averageUtilization: 70
-  
+        averageUtilization: 60          # alvo de utilização de CPU em 60%
+
   behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 60    # tempo para estabilização antes de aumentar réplicas
+      policies:                         # políticas de aumento
+      - type: Percent                   # política baseada em porcentagem
+        value: 200                      # aumenta no máximo 200% das réplicas atuais por período
+        periodSeconds: 30               # período de 30 segundos
     scaleDown:
-      stabilizationWindowSeconds: 120   # A CPU precisa ficar abaixo do alvo por 2 minutos antes de reduzir réplicas
-      policies:
-      - type: Pods                      # Política de redução de réplicas    
-        value: 1                        # Reduz no máximo 1 réplica por vez
-        periodSeconds: 60               # A cada 60 segundos avalia a redução de réplicas
+      stabilizationWindowSeconds: 60    # tempo para estabilização antes de reduzir réplicas
+      policies: 
+      - type: Pods                      # política de redução baseada em número de pods
+        value: 1                        # reduz no máximo 1 pod por período
+        periodSeconds: 60               # período de 60 segundos
