@@ -70,9 +70,6 @@ jobs:
         
       - name: Apply Namespaces
         run: kubectl apply -f Kubernetes/namespace.yaml
-      
-      # - name: Apply Ingress
-      #   run: kubectl apply -f Kubernetes/ingress-dev.yaml -n fcg-dev
 
       - name: Apply ConfigMap and Secret
         run: |
@@ -84,15 +81,15 @@ jobs:
              export ENV="${{ vars.ENV }}"
              export ELASTICSEARCH_URL="${{ vars.ELASTICSEARCH_URL }}"
              export ELASTICSEARCH_API_KEY="${{ secrets.ELASTICSEARCH_API_KEY }}"
-             envsubst < Kubernetes/configmap.yaml | kubectl apply -n fcg-dev -f -           # aplica o configmap com substituição de variáveis
-             envsubst < Kubernetes/secret.yaml | kubectl apply -n fcg-dev -f -              # aplica o secret com substituição de variáveis
+             envsubst < Kubernetes/configmap.yaml | kubectl apply -n fcg-games-dev -f -           # aplica o configmap com substituição de variáveis
+             envsubst < Kubernetes/secret.yaml | kubectl apply -n fcg-games-dev -f -              # aplica o secret com substituição de variáveis
 
       - name: Deploy to AKS - DEV
         run: |
-             export IMAGE_TAG="${{ needs.build-test-pushDockerImage.outputs.image_tag }}"   # tag da imagem Docker
-             envsubst < Kubernetes/deployment.yaml | kubectl apply -n fcg-dev -f -          # aplica o deployment com substituição de variáveis
-             kubectl apply -f Kubernetes/service.yaml -n fcg-dev                            # aplica o service
-             kubectl rollout status deployment/fcg-games -n fcg-dev                         # aguarda o rollout completar
+             export IMAGE_TAG="${{ needs.build-test-pushDockerImage.outputs.image_tag }}"         # tag da imagem Docker
+             envsubst < Kubernetes/deployment.yaml | kubectl apply -n fcg-games-dev -f -          # aplica o deployment com substituição de variáveis
+             kubectl apply -f Kubernetes/service.yaml -n fcg-games-dev                            # aplica o service
+             kubectl rollout status deployment/fcg-games -n fcg-games-dev                         # aguarda o rollout completar
 
   deploy-uat:
     needs:
@@ -115,9 +112,6 @@ jobs:
         
       - name: Apply Namespaces
         run: kubectl apply -f Kubernetes/namespace.yaml
-      
-      # - name: Apply Ingress
-      #   run: kubectl apply -f Kubernetes/ingress-uat.yaml -n fcg-uat
 
       - name: Apply ConfigMap and Secret
         run: |
@@ -129,15 +123,15 @@ jobs:
              export ENV="${{ vars.ENV }}"
              export ELASTICSEARCH_URL="${{ vars.ELASTICSEARCH_URL }}"
              export ELASTICSEARCH_API_KEY="${{ secrets.ELASTICSEARCH_API_KEY }}"
-             envsubst < Kubernetes/configmap.yaml | kubectl apply -n fcg-uat -f -           # aplica o configmap com substituição de variáveis
-             envsubst < Kubernetes/secret.yaml | kubectl apply -n fcg-uat -f -              # aplica o secret com substituição de variáveis
+             envsubst < Kubernetes/configmap.yaml | kubectl apply -n fcg-games-uat -f -           # aplica o configmap com substituição de variáveis
+             envsubst < Kubernetes/secret.yaml | kubectl apply -n fcg-games-uat -f -              # aplica o secret com substituição de variáveis
 
       - name: Deploy to AKS - UAT
         run: |
-             export IMAGE_TAG="${{ needs.build-test-pushDockerImage.outputs.image_tag }}"   # tag da imagem Docker
-             envsubst < Kubernetes/deployment.yaml | kubectl apply -n fcg-uat -f -          # aplica o deployment com substituição de variáveis
-             kubectl apply -f Kubernetes/service.yaml -n fcg-uat                            # aplica o service
-             kubectl rollout status deployment/fcg-games -n fcg-uat                         # aguarda o rollout completar
+             export IMAGE_TAG="${{ needs.build-test-pushDockerImage.outputs.image_tag }}"         # tag da imagem Docker
+             envsubst < Kubernetes/deployment.yaml | kubectl apply -n fcg-games-uat -f -          # aplica o deployment com substituição de variáveis
+             kubectl apply -f Kubernetes/service.yaml -n fcg-games-uat                            # aplica o service
+             kubectl rollout status deployment/fcg-games -n fcg-games-uat                         # aguarda o rollout completar
 
   deploy-prd:
     needs:
@@ -162,9 +156,6 @@ jobs:
         
       - name: Apply Namespaces
         run: kubectl apply -f Kubernetes/namespace.yaml
-      
-      # - name: Apply Ingress
-      #   run: kubectl apply -f Kubernetes/ingress.yaml -n fcg
 
       - name: Apply ConfigMap and Secret
         run: |
@@ -176,12 +167,12 @@ jobs:
              export ENV="${{ vars.ENV }}"
              export ELASTICSEARCH_URL="${{ vars.ELASTICSEARCH_URL }}"
              export ELASTICSEARCH_API_KEY="${{ secrets.ELASTICSEARCH_API_KEY }}"
-             envsubst < Kubernetes/configmap.yaml | kubectl apply -n fcg -f -           # aplica o configmap com substituição de variáveis
-             envsubst < Kubernetes/secret.yaml | kubectl apply -n fcg -f -              # aplica o secret com substituição de variáveis
+             envsubst < Kubernetes/configmap.yaml | kubectl apply -n fcg-games -f -           # aplica o configmap com substituição de variáveis
+             envsubst < Kubernetes/secret.yaml | kubectl apply -n fcg-games -f -              # aplica o secret com substituição de variáveis
 
       - name: Deploy to AKS - PRD
         run: |
-             export IMAGE_TAG="${{ needs.build-test-pushDockerImage.outputs.image_tag }}"   # tag da imagem Docker
-             envsubst < Kubernetes/deployment.yaml | kubectl apply -n fcg -f -          # aplica o deployment com substituição de variáveis
-             kubectl apply -f Kubernetes/service.yaml -n fcg                            # aplica o service
-             kubectl rollout status deployment/fcg-games -n fcg                         # aguarda o rollout completar
+             export IMAGE_TAG="${{ needs.build-test-pushDockerImage.outputs.image_tag }}"     # tag da imagem Docker
+             envsubst < Kubernetes/deployment.yaml | kubectl apply -n fcg-games -f -          # aplica o deployment com substituição de variáveis
+             kubectl apply -f Kubernetes/service.yaml -n fcg-games                            # aplica o service
+             kubectl rollout status deployment/fcg-games -n fcg-games                         # aguarda o rollout completar

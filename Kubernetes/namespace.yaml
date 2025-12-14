@@ -4,7 +4,7 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: fcg               # Namespace principal (produção)
+  name: fcg-games               # Namespace principal (produção)
   labels:
     environment: prd
 
@@ -12,7 +12,7 @@ metadata:
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: fcg-dev           # Namespace para ambiente de desenvolvimento
+  name: fcg-games-dev           # Namespace para ambiente de desenvolvimento
   labels:
     environment: dev
 
@@ -20,6 +20,6 @@ metadata:
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: fcg-uat           # Namespace para ambiente de homologação (User Acceptance Testing)
+  name: fcg-games-uat           # Namespace para ambiente de homologação (User Acceptance Testing)
   labels:
     environment: uat
