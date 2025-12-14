@@ -20,6 +20,9 @@ spec:
           image: acrfcg.azurecr.io/fiapcloudgames/games/api:${IMAGE_TAG}    # Imagem do container no ACR
           ports:                                                            # Porta exposta internamente no container
             - containerPort: 8080
+          resources:
+            requests:
+              cpu: 100m
           env:
             # from ConfigMap
             - name: NEW_RELIC_APP_NAME
