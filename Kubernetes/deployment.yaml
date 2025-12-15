@@ -37,11 +37,11 @@ spec:
               # 8 GiB (total) - ~1,3 GiB (uso interno do Kubernetes) = 6,7 GiB disponíveis
               # 6,7 GiB / 10 pods = 670 Mi por pod
               # Limit ajustado para evitar OutOfMemory e permitir burst controlado
-              memory: 600Mi
+              memory: 500Mi
               
             requests:
-              cpu: 250m         # Sobra ~1,1 vCPU para kube-system + picos
-              memory: 500Mi     # Sobra ~1,7 GiB para kube-system + DaemonSets
+              cpu: 150m         # Sobra ~1,1 vCPU para kube-system + picos
+              memory: 200Mi     # Sobra ~1,7 GiB para kube-system + DaemonSets
           env:
             # from ConfigMap
             - name: NEW_RELIC_APP_NAME
