@@ -12,7 +12,7 @@ namespace Application.Helpers
         /// Converte uma data/hora UTC para o fuso horário informado.
         /// </summary>
         /// <param name="utcDateTime">Data/hora em UTC</param>
-        /// <param name="timeZoneId">ID do timezone (ex: "E. South America Standard Time" para São Paulo)</param>
+        /// <param name="timeZoneId">ID do timezone (ex: "America/Sao_Paulo" para São Paulo)</param>
         /// <returns>DateTime convertido para o timezone especificado</returns>
         public static DateTime ConvertUtcToTimeZone(DateTime utcDateTime, string timeZoneId)
         {
@@ -30,7 +30,7 @@ namespace Application.Helpers
         /// Converte uma data/hora local para UTC com base no timezone informado.
         /// </summary>
         /// <param name="localDateTime">Data/hora local</param>
-        /// <param name="timeZoneId">ID do timezone (ex: "E. South America Standard Time")</param>
+        /// <param name="timeZoneId">ID do timezone (ex: "America/Sao_Paulo")</param>
         /// <returns>DateTime em UTC</returns>
         public static DateTime ConvertTimeZoneToUtc(DateTime localDateTime, string timeZoneId)
         {

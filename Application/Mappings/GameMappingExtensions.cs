@@ -34,9 +34,9 @@ namespace Application.Mappings
                 Genre = entity.Genre,
                 Price = entity.Price,
                 ReleaseDate = entity.ReleaseDate,
-                CreatedAt = DateTimeHelper.ConvertUtcToTimeZone(entity.CreatedAt, "E. South America Standard Time"),
+                CreatedAt = DateTimeHelper.ConvertUtcToTimeZone(entity.CreatedAt, "America/Sao_Paulo"),
                 UpdatedAt = entity.UpdatedAt.HasValue ? 
-                                DateTimeHelper.ConvertUtcToTimeZone(entity.UpdatedAt.Value, "E. South America Standard Time") : (DateTime?)null,
+                                DateTimeHelper.ConvertUtcToTimeZone(entity.UpdatedAt.Value, "America/Sao_Paulo") : (DateTime?)null,
                 Rating = entity.Rating
             };
         }
