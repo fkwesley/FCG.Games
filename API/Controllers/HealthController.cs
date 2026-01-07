@@ -1,5 +1,4 @@
 ﻿using API.Models;
-using Application.DTO.User;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
@@ -12,12 +11,12 @@ namespace API.Controllers
         /// returns the current health status of the api.
         /// </summary>
         /// <returns>No content</returns>
-        [ProducesResponseType(typeof(UserResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status500InternalServerError)]
-        [HttpPost(Name = "Health")]
+        [HttpGet(Name = "Health")]
         public IActionResult Health()
         {
-            return Ok();
+            return Ok("Healthy");
         }
     }
 }

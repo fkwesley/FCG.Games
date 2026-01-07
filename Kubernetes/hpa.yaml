@@ -1,0 +1,34 @@
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: fcg-games-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: fcg-games
+
+  minReplicas: 1
+  maxReplicas: 10
+  
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 60          # alvo de utilização de CPU em 60%
+
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 60    # tempo para estabilização antes de aumentar réplicas
+      policies:                         # políticas de aumento
+      - type: Percent                   # política baseada em porcentagem
+        value: 200                      # aumenta no máximo 200% das réplicas atuais por período
+        periodSeconds: 30               # período de 30 segundos
+    scaleDown:
+      stabilizationWindowSeconds: 60    # tempo para estabilização antes de reduzir réplicas
+      policies: 
+      - type: Pods                      # política de redução baseada em número de pods
+        value: 1                        # reduz no máximo 1 pod por período
+        periodSeconds: 60               # período de 60 segundos

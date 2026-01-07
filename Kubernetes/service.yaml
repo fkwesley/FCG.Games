@@ -1,0 +1,15 @@
+apiVersion: v1              # API para criação de Services
+kind: Service               # Tipo do objeto: Service permite acessar o Deployment
+
+metadata:
+  name: fcg-games-svc       # Nome do Service
+
+spec:
+  type: LoadBalancer        # Tipo do Service: LoadBalancer cria um IP público
+
+  selector:
+    app: fcg-games          # O selector conecta este Service aos Pods com este label
+
+  ports:                    # Mapeamento de portas
+    - port: 80              # Porta interna exposta no Service
+      targetPort: 8080      # Porta interna do container

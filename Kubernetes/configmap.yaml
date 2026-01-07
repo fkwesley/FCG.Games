@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fcg-games-config
+data:
+  NEW_RELIC_APP_NAME: "${NEW_RELIC_APP_NAME}"
+  NewRelic__Enabled: "${NEW_RELIC_ENABLED}"
+  NewRelic__Endpoint: "${NEW_RELIC_ENDPOINT}"
+  ElasticSearch__ServerUrl: "${ELASTICSEARCH_URL}"
+  AspNetCore_Environment: "${ENV}"

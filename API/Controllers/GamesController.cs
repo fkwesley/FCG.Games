@@ -25,6 +25,7 @@ namespace API.Controllers
         /// <returns>List of Users</returns>
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<GameResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetAll()
@@ -39,6 +40,7 @@ namespace API.Controllers
         /// <returns>List of Games</returns>
         [HttpGet("search")]
         [ProducesResponseType(typeof(IEnumerable<GameResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status500InternalServerError)]
         public IActionResult Search([FromQuery] string? name, 
@@ -68,6 +70,7 @@ namespace API.Controllers
         /// <returns>List of Games</returns>
         [HttpGet("top-rated")]
         [ProducesResponseType(typeof(IEnumerable<GameResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status500InternalServerError)]
         public IActionResult GetTopRating([FromQuery] int top)
@@ -82,6 +85,7 @@ namespace API.Controllers
         /// <returns>Object Game</returns> 
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(GameResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status500InternalServerError)]
         public IActionResult GetById(int id)
@@ -100,6 +104,7 @@ namespace API.Controllers
         [Authorize(Roles = "Admin")]
         [ProducesResponseType(typeof(GameResponse), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status500InternalServerError)]
         public IActionResult Add([FromBody] GameRequest gameRequest)
         {
@@ -117,6 +122,7 @@ namespace API.Controllers
         [Authorize(Roles = "Admin")]
         [ProducesResponseType(typeof(GameResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status500InternalServerError)]
         public IActionResult Update(int id, [FromBody] GameRequest gameRequest)
@@ -136,6 +142,7 @@ namespace API.Controllers
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin")]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status204NoContent)]
+        [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status500InternalServerError)]
         public IActionResult Delete(int id)

@@ -1,0 +1,25 @@
+# Este arquivo cria múltiplos namespaces no cluster
+# Namespaces ajudam a organizar e isolar recursos no Kubernetes
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: fcg-games               # Namespace principal (produção)
+  labels:
+    environment: prd
+
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: fcg-games-dev           # Namespace para ambiente de desenvolvimento
+  labels:
+    environment: dev
+
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: fcg-games-uat           # Namespace para ambiente de homologação (User Acceptance Testing)
+  labels:
+    environment: uat

@@ -1,0 +1,94 @@
+apiVersion: apps/v1                                                         # Versão da API do Kubernetes usada para criar Deployments
+kind: Deployment                                                            # Tipo do objeto: Deployment cria réplicas e faz rollout
+metadata:
+  name: fcg-games                                                           # Nome do Deployment
+
+spec:
+  replicas: 1                                                               # Quantas réplicas (pods) deseja rodar
+  selector:                                                                 # Selector: identifica quais pods pertencem a este Deployment
+    matchLabels:
+      app: fcg-games
+
+  template:                                                                 # Template: modelo usado para criar cada Pod
+    metadata:
+      labels:                                                               # Labels aplicadas nos Pods criados
+        app: fcg-games
+
+    spec:
+      containers:                                                           # Lista de containers dentro do Pod
+        - name: fcg-users-container                                         # Nome do container
+          image: acrfcg.azurecr.io/fiapcloudgames/games/api:${IMAGE_TAG}    # Imagem do container no ACR
+          ports:                                                            # Porta exposta internamente no container
+            - containerPort: 8080
+          resources:
+            limits:
+              # =========================
+              # CPU
+              # =========================
+              # 2 nodes Standard A2 v2 com 2 vCPU cada = 4 vCPU totais
+              # 4 vCPU (total) - 0,4 vCPU (uso interno do Kubernetes) = 3,6 vCPU
+              # 3,6 vCPU / 10 pods = 0,36 vCPU (360 milicores)
+              cpu: 360m
+              
+              # =========================
+              # MEMORY
+              # =========================
+              # 2 nodes Standard A2 v2 com 4 GiB cada = 8 GiB totais
+              # 8 GiB (total) - ~1,3 GiB (uso interno do Kubernetes) = 6,7 GiB disponíveis
+              # 6,7 GiB / 10 pods = 670 Mi por pod
+              # Limit ajustado para evitar OutOfMemory e permitir burst controlado
+              memory: 500Mi
+              
+            requests:
+              cpu: 150m         # Sobra ~1,1 vCPU para kube-system + picos
+              memory: 200Mi     # Sobra ~1,7 GiB para kube-system + DaemonSets
+          env:
+            # from ConfigMap
+            - name: NEW_RELIC_APP_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: fcg-games-config
+                  key: NEW_RELIC_APP_NAME
+
+            - name: NewRelic__Enabled
+              valueFrom:
+                configMapKeyRef:
+                  name: fcg-games-config
+                  key: NewRelic__Enabled
+
+            - name: NewRelic__Endpoint
+              valueFrom:
+                configMapKeyRef:
+                  name: fcg-games-config
+                  key: NewRelic__Endpoint
+
+            - name: AspNetCore_Environment
+              valueFrom:
+                configMapKeyRef:
+                  name: fcg-games-config
+                  key: AspNetCore_Environment
+
+            - name: ElasticSearch__ServerUrl
+              valueFrom:
+                configMapKeyRef:
+                  name: fcg-games-config
+                  key: ElasticSearch__ServerUrl
+
+            # from Secret
+            - name: ConnectionStrings__FCGUsersDbConnection
+              valueFrom:
+                secretKeyRef:
+                  name: fcg-games-secret
+                  key: ConnectionStrings__FCGUsersDbConnection
+
+            - name: NewRelic__LicenseKey
+              valueFrom:
+                secretKeyRef:
+                  name: fcg-games-secret
+                  key: NewRelic__LicenseKey
+
+            - name: ElasticSearch__ApiKey
+              valueFrom:
+                secretKeyRef:
+                  name: fcg-games-secret
+                  key: ElasticSearch__ApiKey
