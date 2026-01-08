@@ -20,9 +20,9 @@ namespace API.Controllers
 
         #region GETS
         /// <summary>
-        /// Returns all users registered.
+        /// Returns all games registered.
         /// </summary>
-        /// <returns>List of Users</returns>
+        /// <returns>List of Games</returns>
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<GameResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status401Unauthorized)]
