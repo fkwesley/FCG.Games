@@ -64,7 +64,7 @@ Desenvolver uma API RESTful robusta e escalável, aplicando:
     - Migração versão da imagem Docker do .NET para uma versão mais leve, otimizando recursos dos containers
     - Aplicações adaptadas para trabalhar com a versão mais leve
     - Redução de aproximadamente 50% do tamanho das imagens
-  - **Monitoramento
+  - **Monitoramento**
     - Elastic.APM instrumentado nas apis e no worker service
     - dashboards com métricas de CPU, memória, requisições, pods...
 
