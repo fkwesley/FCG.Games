@@ -9,7 +9,7 @@ spec:
     name: fcg-games
 
   minReplicas: 1
-  maxReplicas: 10
+  maxReplicas: 8
   
   metrics:
   - type: Resource
@@ -18,12 +18,6 @@ spec:
       target:
         type: Utilization
         averageUtilization: 2          # alvo de utilização de CPU em 10%
-  - type: Resource
-    resource:
-      name: memory
-      target:
-        type: Utilization
-        averageUtilization: 20          # alvo de utilização de memória em 20%
     
   behavior:
     scaleUp:
