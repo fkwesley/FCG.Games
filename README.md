@@ -40,7 +40,7 @@ Desenvolver uma API RESTful robusta e escalável, aplicando:
     - Dashboards de monitoramento (New Relic e Azure)
 ### **Fase 3:** 
   - **Migração arquitetura Monolitica x Micro-serviços:**
-    - Separação da API em dois serviços distintos com base nos contextos delimitados (Users, Games, Orders, Payments)
+    - Separação da API em serviços distintos com base nos contextos delimitados (Users, Games, Orders, Payments)
     - Cada API com seu próprio repositório e infraestrutura (banco de dados, container app e pipeline CI/CD)
   - **Adoção de soluções Serverless:**
     - Arquitetura orientada a eventos com comunicação assíncrona via mensageria (Azure Service Bus)
@@ -285,7 +285,7 @@ Este projeto utiliza um Dockerfile em duas etapas para garantir uma imagem otimi
 - **Stage 1 - Build**: Usa a imagem oficial do .NET SDK 8.0 para restaurar dependências, compilar e publicar a aplicação em modo Release.
 - **Stage 2 - Runtime**: Utiliza a versão alpine (mais leve do ASP.NET 8.0) para executar a aplicação, copiando apenas os artefatos publicados da etapa de build, o que reduz o tamanho final da imagem.
 
-- Além disso, o agente do **New Relic** é instalado na imagem de runtime para habilitar monitoramento detalhado da aplicação. As variáveis de ambiente necessárias para a configuração do agente são definidas no Dockerfile, podendo ser sobrescritas via ambiente de execução (ex.: Kubernetes, Azure Container Apps).
+Além disso, o agente do **New Relic** é instalado na imagem de runtime para habilitar monitoramento detalhado da aplicação. As variáveis de ambiente necessárias para a configuração do agente são definidas no Dockerfile, podendo ser sobrescritas via ambiente de execução (ex.: Kubernetes, Azure Container Apps).
 
 Esse processo segue as melhores práticas:
 
@@ -298,4 +298,3 @@ Esse processo segue as melhores práticas:
 - Frank Vieira
 - GitHub: @fkwesley
 - Projeto desenvolvido para fins educacionais no curso da FIAP.
- 
