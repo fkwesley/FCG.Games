@@ -185,3 +185,7 @@ jobs:
              envsubst < Kubernetes/deployment.yaml | kubectl apply -n fcg-games -f -          # aplica o deployment com substituição de variáveis
              kubectl apply -f Kubernetes/service.yaml -n fcg-games                            # aplica o service
              kubectl rollout status deployment/fcg-games -n fcg-games                         # aguarda o rollout completar
+       
+      - name: Deploy HPA
+        run: |
+             kubectl apply -f Kubernetes/hpa.yaml -n fcg-games                                # aplica o HPA
