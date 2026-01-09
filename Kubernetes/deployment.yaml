@@ -16,7 +16,7 @@ spec:
 
     spec:
       containers:                                                           # Lista de containers dentro do Pod
-        - name: fcg-users-container                                         # Nome do container
+        - name: fcg-games-container                                         # Nome do container
           image: acrfcg.azurecr.io/fiapcloudgames/games/api:${IMAGE_TAG}    # Imagem do container no ACR
           ports:                                                            # Porta exposta internamente no container
             - containerPort: 8080

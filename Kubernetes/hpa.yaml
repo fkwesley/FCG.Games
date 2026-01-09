@@ -17,8 +17,14 @@ spec:
       name: cpu
       target:
         type: Utilization
-        averageUtilization: 12          # alvo de utilização de CPU em 60%
-
+        averageUtilization: 2          # alvo de utilização de CPU em 10%
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 20          # alvo de utilização de memória em 20%
+    
   behavior:
     scaleUp:
       stabilizationWindowSeconds: 60    # tempo para estabilização antes de aumentar réplicas
