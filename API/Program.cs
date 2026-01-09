@@ -170,6 +170,9 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddAuthorization();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+
+if (configuration["ElasticApm:Enabled"].ToLower() == "true")
+    builder.Services.AddAllElasticApm();
 #endregion
 
 #region invalidModel
