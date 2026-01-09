@@ -3,8 +3,12 @@ kind: ConfigMap
 metadata:
   name: fcg-games-config
 data:
-  NEW_RELIC_APP_NAME: "${NEW_RELIC_APP_NAME}"
+  NEW_RELIC_APP_NAME: "${APM_SERVICE_NAME}"
   NewRelic__Enabled: "${NEW_RELIC_ENABLED}"
   NewRelic__Endpoint: "${NEW_RELIC_ENDPOINT}"
   ElasticSearch__ServerUrl: "${ELASTICSEARCH_URL}"
   AspNetCore_Environment: "${ENV}"
+  ElasticApm__Enabled: "${ELASTIC_APM_ENABLED}"
+  ElasticApm__ServerUrl: "${ELASTIC_APM_SERVER_URL}"
+  ElasticApm__ServiceName: "${APM_SERVICE_NAME}"
+  ElasticApm__Environment: "${ENV}"
