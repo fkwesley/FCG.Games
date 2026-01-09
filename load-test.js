@@ -7,7 +7,7 @@ export const options = {
             executor: 'ramping-arrival-rate',
             timeUnit: '1m',                             // unidade de tempo para o arrival rate
             preAllocatedVUs: 5,
-            maxVUs: 30,
+            maxVUs: 500,
             stages: [
                 // 🔹 Fase 1 — carga baixa (baseline)
                 { target: 800, duration: '1m' },         // começa com 120 RPM durante 1 minuto (2 por segundo)
