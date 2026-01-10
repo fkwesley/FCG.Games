@@ -5,7 +5,7 @@ API desenvolvida para gerenciamento de jogos, com foco em micro-serviços e arqu
 - [Vídeo com a apresentação da Fase 1](https://youtu.be/bmRaU8VjJZU)
 - [Vídeo com a apresentação da Fase 2](https://youtu.be/BXBc6JKnRpw)
 - [Vídeo com a apresentação da Fase 3](https://youtu.be/3OxTOgieuMg)
-- [Vídeo com a apresentação da Fase 4](https://youtu.be/3OxTOgieuMg)
+- [Vídeo com a apresentação da Fase 4](https://youtu.be/WwIfjVCoxc8)
 
 ## 📌 Objetivo
 
